@@ -1,7 +1,7 @@
 /*                      client/src/components/Catalogo.css                     */
 .paginationBttns {
   width: 80%;
-  heigth: 40px;
+  height: 40px;
   list-style: none;
   display: flex;
   justify-content: center;

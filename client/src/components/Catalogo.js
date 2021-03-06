@@ -11,7 +11,7 @@ const Catalogo = (props) => {
 
     var [allProducts, setAllProducts] = useState(props.products);
     var [orderBy, setOrderBy] = useState("");
-    var [estadoProducto, setEstadoProducto] = useState("new");
+    var [estadoProducto, setEstadoProducto] = useState("");
     const [pageNumber, setPageNumber] = useState(0);
     const productsPerPage = 30
     const pageVisited = pageNumber * productsPerPage
