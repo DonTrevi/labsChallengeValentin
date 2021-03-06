@@ -1,58 +1,84 @@
+/*                      client/src/components/Catalogo.js                    */
 import React, { Fragment,  useState } from "react";
 import ProductCard from "./ProductCard.js";
+import ReactPaginate from 'react-paginate';
+import styles from './Catalogo.css'
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 const Catalogo = (props) => {
 
+    var [allProducts, setAllProducts] = useState(props.products);
     var [orderBy, setOrderBy] = useState("");
     var [estadoProducto, setEstadoProducto] = useState("new");
-    var [allProducts, setAllProducts] = useState(props.products);
+    const [pageNumber, setPageNumber] = useState(0);
+    const productsPerPage = 30
+    const pageVisited = pageNumber * productsPerPage
+    const esNuevo = () => item => {return item.condition === "new"}
+    const esUsado = () => item => {return item.condition === "used"}
+    const newProducts = props.products.slice(pageVisited, pageVisited + productsPerPage)
+
+    var sortF = () => {}
+
+        switch (orderBy) {
+            case 'menorMayor':
+                sortF = (a, b) => {
+                    if (a.price < b.price) {
+                        return -1
+                    }
+                    if (a.price > b.price) {
+                        return 1
+                    }
+                    return 0
+                }
+                break;
+            case 'mayorMenor':
+                sortF = (a, b) => {
+                    if (a.price < b.price) {
+                        return 1
+                    }
+                    if (a.price > b.price) {
+                        return -1
+                    }
+                    return 0
+                }
+                break;
+            default:
+                break;
+        }
 
 
-var sortF = () => {}
+    const displayProducts = newProducts.sort(sortF).filter(estadoProducto === "new" ? esNuevo() : esUsado()).map(product => {
+      return (
+          <ProductCard
+              title={product.title}
+              price={product.price}
+              currency_id={product.currency_id}
+              available_quantity={product.available_quantity}
+              thumbnail={product.thumbnail}
+              condition={product.condition}
+          />
+      );
+    })
 
-    switch (orderBy) {
-        case 'menorMayor':
-            sortF = (a, b) => {
-                if (a.price < b.price) {
-                    return -1
-                }
-                if (a.price > b.price) {
-                    return 1
-                }
-                return 0
-            }
-            break;
-        case 'mayorMenor':
-            sortF = (a, b) => {
-                if (a.price < b.price) {
-                    return 1
-                }
-                if (a.price > b.price) {
-                    return -1
-                }
-                return 0
-            }
-            break;
-        default:
-            break;
+
+    const pageCount = Math.ceil(props.products.length / productsPerPage)
+
+    const changePage = ({selected}) => {
+      setPageNumber(selected)
     }
 
 
-    const esNuevo = () => item => {return item.condition === "new"}
 
-    const esUsado = () => item => {return item.condition === "used"}
 
-    const sonTodos = () => item => {return item}
 
 
     return (
         <Fragment>
             {" "}
             <div>Catalogo</div>
-            
+
                      <div>
                      <span>Ordenar:
                      <select id='precio' name="precio">
@@ -68,18 +94,19 @@ var sortF = () => {}
                      </span>
                     </div>
             <div>
-                {props.products.sort(sortF).filter(estadoProducto && estadoProducto==='new'?esNuevo():esUsado()).map((item) => {
-                    return (
-                        <ProductCard
-                            title={item.title}
-                            price={item.price}
-                            currency_id={item.currency_id}
-                            available_quantity={item.available_quantity}
-                            thumbnail={item.thumbnail}
-                            condition={item.condition}
-                        />
-                    );
-                })}
+                {displayProducts}
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  pageCount={pageCount}
+                  onPageChange={changePage}
+                  containerClassName={"paginationBttns"}
+                  previousLinkClassName={"previousBttn"}
+                  nextLinkClassName={"nextBttn"}
+                  disabledClassName={"paginationDisabled"}
+                  activeClassName={"paginationActive"}
+
+                />
 
             </div>
         </Fragment>
